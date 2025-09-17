@@ -25,8 +25,7 @@ android.arch = arm64-v8a, armeabi-v7a
 android.build_tools_version = 33.0.2  # стабильная версия
 android.allow_backup = True
 # Права
-android.permissions = INTERNET
-android.permissions = WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
+android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 # Логирование
 log_level = 2
 source.dir = .
