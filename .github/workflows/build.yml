@@ -11,17 +11,17 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      # 1️⃣ Клонируем репозиторий
+      # 1️ Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Устанавливаем Python 3.11
+      # 2️ Устанавливаем Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # 3️⃣ Системные зависимости
+      # 3️ Системные зависимости
       - name: Install system dependencies
         run: |
           sudo apt update
@@ -31,14 +31,14 @@ jobs:
             zlib1g-dev libffi-dev libssl-dev \
             libsqlite3-dev libncurses5-dev unzip curl wget
 
-      # 4️⃣ Python-пакеты
+      # 4️ Python-пакеты
       - name: Install Python packages
         run: |
           python3.11 -m ensurepip --upgrade
           python3.11 -m pip install --upgrade pip setuptools wheel
           python3.11 -m pip install cython buildozer kivy matplotlib numpy
 
-      # 5️⃣ Android SDK и Build-Tools
+      # 5️ Android SDK и Build-Tools
       - name: Install Android SDK and Build Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -59,19 +59,19 @@ jobs:
           # Устанавливаем стабильную платформу и Build-Tools
           sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      # 6️⃣ Инициализация buildozer
+      # 6️ Инициализация buildozer
       - name: Initialize buildozer
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
 
-      # 7️⃣ Сборка APK
+      # 7️ Сборка APK
       - name: Build APK
         run: |
           buildozer -v android debug
 
-      # 8️⃣ Загрузка APK как артефакт
+      # 8️ Загрузка APK как артефакт
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
