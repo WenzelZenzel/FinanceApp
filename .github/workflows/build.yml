@@ -1,56 +1,52 @@
-name: Build Android APK
+name: Build APK
 
 on:
   push:
     branches:
-      - main  # запускается при пуше в ветку main
-  workflow_dispatch:  # можно запускать вручную из вкладки Actions
+      - main
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Клонируем репозиторий
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # 2️⃣ Устанавливаем Python
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
-      # 3️⃣ Устанавливаем зависимости системы
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3.12-venv python3.12-dev \
-            build-essential git openjdk-11-jdk zlib1g-dev libffi-dev \
-            libssl-dev libsqlite3-dev libncurses5-dev unzip
+          sudo apt install -y \
+            python3.11-venv python3.11-dev python3.11-distutils \
+            build-essential git openjdk-11-jdk \
+            zlib1g-dev libffi-dev libssl-dev \
+            libsqlite3-dev libncurses5-dev unzip curl
 
-      # 4️⃣ Создаём виртуальное окружение и ставим библиотеки
-      - name: Install Python dependencies
+      - name: Install pip, Cython, and Buildozer
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install cython buildozer kivy matplotlib numpy
+          python3.11 -m ensurepip --upgrade
+          python3.11 -m pip install --upgrade pip setuptools wheel
+          python3.11 -m pip install cython buildozer
 
-      # 5️⃣ Настраиваем Java
-      - name: Set JAVA_HOME
+      - name: Initialize buildozer (if not exists)
         run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-          echo "/usr/lib/jvm/java-11-openjdk-amd64/bin" >> $GITHUB_PATH
+          if [ ! -f buildozer.spec ]; then
+            buildozer init
+          fi
 
-      # 6️⃣ Сборка APK
       - name: Build APK
         run: |
-          source venv/bin/activate
-          buildozer android debug
+          buildozer -v android debug
 
-      # 7️⃣ Загружаем APK как артефакт
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-apk
+          name: FinanceApp-APK
           path: bin/*.apk
+
