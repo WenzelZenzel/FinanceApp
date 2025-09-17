@@ -50,7 +50,7 @@ jobs:
 
       # 7️⃣ Загружаем APK как артефакт
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: my-apk
           path: bin/*.apk
