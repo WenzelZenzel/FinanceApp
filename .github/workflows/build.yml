@@ -1,50 +1,57 @@
-name: Build APK
+name: Build Android APK
 
 on:
   push:
     branches:
       - main
-  pull_request:
+  workflow_dispatch:  # позволяет запускать вручную
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # здесь Python 3.12 по умолчанию
 
     steps:
+      # 1️⃣ Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.11
+      # 2️⃣ Устанавливаем Python 3.12 (системный)
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
+      # 3️⃣ Устанавливаем системные зависимости
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
-            python3.11-venv python3.11-dev python3.11-distutils \
+            python3.12-venv python3.12-dev python3-distutils \
             build-essential git openjdk-11-jdk \
             zlib1g-dev libffi-dev libssl-dev \
             libsqlite3-dev libncurses5-dev unzip curl
 
-      - name: Install pip, Cython, and Buildozer
+      # 4️⃣ Устанавливаем pip, setuptools, Cython и Buildozer
+      - name: Install Python packages
         run: |
-          python3.11 -m ensurepip --upgrade
-          python3.11 -m pip install --upgrade pip setuptools wheel
-          python3.11 -m pip install cython buildozer
+          python3.12 -m ensurepip --upgrade
+          python3.12 -m pip install --upgrade pip setuptools wheel
+          python3.12 -m pip install cython buildozer kivy matplotlib numpy
 
-      - name: Initialize buildozer (if not exists)
+      # 5️⃣ Инициализация buildozer (если нет buildozer.spec)
+      - name: Initialize buildozer
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
 
+      # 6️⃣ Сборка APK
       - name: Build APK
         run: |
           buildozer -v android debug
 
-      - name: Upload APK artifact
+      # 7️⃣ Загрузка APK как артефакт
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FinanceApp-APK
