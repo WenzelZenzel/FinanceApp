@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # позволяет запускать вручную
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # стабильная среда с Python 3.11
+    runs-on: ubuntu-22.04
 
     steps:
       # 1️⃣ Клонируем репозиторий
@@ -29,7 +29,7 @@ jobs:
             python3.11-venv python3.11-dev python3.11-distutils \
             build-essential git openjdk-11-jdk \
             zlib1g-dev libffi-dev libssl-dev \
-            libsqlite3-dev libncurses5-dev unzip curl
+            libsqlite3-dev libncurses5-dev unzip curl wget
 
       # 4️⃣ Устанавливаем pip, setuptools, Cython и Buildozer
       - name: Install Python packages
@@ -38,41 +38,42 @@ jobs:
           python3.11 -m pip install --upgrade pip setuptools wheel
           python3.11 -m pip install cython buildozer kivy matplotlib numpy
 
-       # 5️⃣ Устанавливаем Android SDK и Build-Tools
+      # 5️⃣ Устанавливаем Android SDK и Build-Tools
       - name: Install Android SDK and Build Tools
         run: |
-          mkdir -p $HOME/android-sdk
+          mkdir -p $HOME/android-sdk/cmdline-tools
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           
           # Скачиваем command-line tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d $ANDROID_HOME
+          unzip cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          
+          # Перемещаем только содержимое cmdline-tools в latest
           mkdir -p $ANDROID_HOME/cmdline-tools/latest
-          mv $ANDROID_HOME/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
-
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+          
           # Принимаем лицензии
           yes | sdkmanager --licenses
-
+          
           # Устанавливаем платформу и стабильные Build-Tools
           sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      # 5️⃣ Инициализация buildozer (если нет buildozer.spec)
+      # 6️⃣ Инициализация buildozer (если нет buildozer.spec)
       - name: Initialize buildozer
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
 
-      # 6️⃣ Сборка APK
+      # 7️⃣ Сборка APK
       - name: Build APK
         run: |
           buildozer -v android debug
 
-      # 7️⃣ Загрузка APK как артефакт
+      # 8️⃣ Загрузка APK как артефакт
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FinanceApp-APK
           path: bin/*.apk
-
