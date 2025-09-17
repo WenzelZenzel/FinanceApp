@@ -8,25 +8,25 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04  # здесь Python 3.12 по умолчанию
+    runs-on: ubuntu-22.04  # стабильная среда с Python 3.11
 
     steps:
       # 1️⃣ Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Устанавливаем Python 3.12 (системный)
-      - name: Set up Python 3.12
+      # 2️⃣ Устанавливаем Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
       # 3️⃣ Устанавливаем системные зависимости
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
-            python3.12-venv python3.12-dev python3-distutils \
+            python3.11-venv python3.11-dev python3.11-distutils \
             build-essential git openjdk-11-jdk \
             zlib1g-dev libffi-dev libssl-dev \
             libsqlite3-dev libncurses5-dev unzip curl
@@ -34,9 +34,9 @@ jobs:
       # 4️⃣ Устанавливаем pip, setuptools, Cython и Buildozer
       - name: Install Python packages
         run: |
-          python3.12 -m ensurepip --upgrade
-          python3.12 -m pip install --upgrade pip setuptools wheel
-          python3.12 -m pip install cython buildozer kivy matplotlib numpy
+          python3.11 -m ensurepip --upgrade
+          python3.11 -m pip install --upgrade pip setuptools wheel
+          python3.11 -m pip install cython buildozer kivy matplotlib numpy
 
       # 5️⃣ Инициализация buildozer (если нет buildozer.spec)
       - name: Initialize buildozer
