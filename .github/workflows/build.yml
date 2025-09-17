@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3️⃣ Устанавливаем системные зависимости
+      # 3️⃣ Системные зависимости
       - name: Install system dependencies
         run: |
           sudo apt update
@@ -31,14 +31,14 @@ jobs:
             zlib1g-dev libffi-dev libssl-dev \
             libsqlite3-dev libncurses5-dev unzip curl wget
 
-      # 4️⃣ Устанавливаем pip, setuptools, Cython и Buildozer
+      # 4️⃣ Python-пакеты
       - name: Install Python packages
         run: |
           python3.11 -m ensurepip --upgrade
           python3.11 -m pip install --upgrade pip setuptools wheel
           python3.11 -m pip install cython buildozer kivy matplotlib numpy
 
-      # 5️⃣ Устанавливаем Android SDK и Build-Tools
+      # 5️⃣ Android SDK и Build-Tools
       - name: Install Android SDK and Build Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -56,10 +56,10 @@ jobs:
           # Принимаем лицензии
           yes | sdkmanager --licenses
           
-          # Устанавливаем платформу и стабильные Build-Tools
+          # Устанавливаем стабильную платформу и Build-Tools
           sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      # 6️⃣ Инициализация buildozer (если нет buildozer.spec)
+      # 6️⃣ Инициализация buildozer
       - name: Initialize buildozer
         run: |
           if [ ! -f buildozer.spec ]; then
