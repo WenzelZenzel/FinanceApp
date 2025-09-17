@@ -38,6 +38,25 @@ jobs:
           python3.11 -m pip install --upgrade pip setuptools wheel
           python3.11 -m pip install cython buildozer kivy matplotlib numpy
 
+       # 5️⃣ Устанавливаем Android SDK и Build-Tools
+      - name: Install Android SDK and Build Tools
+        run: |
+          mkdir -p $HOME/android-sdk
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          
+          # Скачиваем command-line tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip -d $ANDROID_HOME
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          mv $ANDROID_HOME/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+
+          # Принимаем лицензии
+          yes | sdkmanager --licenses
+
+          # Устанавливаем платформу и стабильные Build-Tools
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
       # 5️⃣ Инициализация buildozer (если нет buildozer.spec)
       - name: Initialize buildozer
         run: |
